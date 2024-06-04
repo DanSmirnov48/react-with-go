@@ -9,19 +9,13 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/joho/godotenv"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/DanSmirnov48/react-with-go/controllers"
+	"github.com/DanSmirnov48/react-with-go/middleware"
 	"github.com/DanSmirnov48/react-with-go/routes"
 )
-
-type Todo struct {
-	ID        primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
-	Completed bool               `json:"completed"`
-	Body      string             `json:"body"`
-}
 
 var collection *mongo.Collection
 
@@ -63,7 +57,10 @@ func main() {
 		AllowHeaders: "Origin,Content-Type,Accept",
 	}))
 
-	routes.SetupRoutes(app)
+	// Apply global middleware
+	app.Use(middleware.GenericMiddleware)
+
+	routes.SetupTodoRoutes(app)
 
 	port := os.Getenv("PORT")
 	if port == "" {
